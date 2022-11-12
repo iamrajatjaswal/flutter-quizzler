@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'quiz_brain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 QuizBrain quizBrain = QuizBrain();
 
@@ -34,27 +35,82 @@ class QuizPage extends StatefulWidget {
 class _QuizPageState extends State<QuizPage> {
   List<Icon> scoreKeeper = [];
 
-  void checkAnswer(bool userPickedAnswer) {
+  void checkAnswer(context, bool userPickedAnswer) {
     bool correctAnswer = quizBrain.getCorrectAnswer();
 
     setState(() {
-      if (correctAnswer == userPickedAnswer) {
-        print('user got it right');
-        scoreKeeper.add(Icon(
-          Icons.check,
-          color: Colors.green,
-        ));
-      } else {
-        print('user got it wrong');
-        scoreKeeper.add(
-          Icon(
-            Icons.close,
-            color: Colors.red,
-          ),
-        );
-      }
+      if (quizBrain.isFinished()) {
+        Alert(
+          context: context,
+          title: 'Finished!',
+          desc: 'You\'ve reached the end of the quiz.',
+        ).show();
 
-      quizBrain.nextQuestion();
+        quizBrain.reset();
+
+        scoreKeeper = [];
+
+        // var alertStyle = AlertStyle(
+        //   isButtonVisible: true,
+        //   animationType: AnimationType.fromTop,
+        //   isCloseButton: true,
+        //   isOverlayTapDismiss: false,
+        //   descStyle: TextStyle(fontWeight: FontWeight.bold),
+        //   descTextAlign: TextAlign.start,
+        //   animationDuration: Duration(milliseconds: 800),
+        //   alertBorder: RoundedRectangleBorder(
+        //     borderRadius: BorderRadius.circular(0.0),
+        //     side: BorderSide(
+        //       color: Colors.grey,
+        //     ),
+        //   ),
+        //   titleStyle: TextStyle(
+        //     color: Colors.red,
+        //   ),
+        //   // alertAlignment: Alignment.topCenter,
+        // );
+        //
+        // Alert(
+        //   context: context,
+        //   style: alertStyle,
+        //   title: "Finished!",
+        //   desc: "You have finished the quiz.",
+        //   buttons: [
+        //     DialogButton(
+        //       child: const Text(
+        //         "CANCEL",
+        //         style: TextStyle(color: Colors.white, fontSize: 20),
+        //       ),
+        //       onPressed: () {
+        //         setState(() {
+        //           scoreKeeper = [];
+        //           quizBrain.reset();
+        //           Navigator.pop(context);
+        //         });
+        //       },
+        //       width: 120,
+        //     )
+        //   ],
+        // ).show();
+      } else {
+        if (correctAnswer == userPickedAnswer) {
+          print('user got it right');
+          scoreKeeper.add(const Icon(
+            Icons.check,
+            color: Colors.green,
+          ));
+        } else {
+          print('user got it wrong');
+          scoreKeeper.add(
+            const Icon(
+              Icons.close,
+              color: Colors.red,
+            ),
+          );
+        }
+
+        quizBrain.nextQuestion();
+      }
     });
   }
 
@@ -98,7 +154,7 @@ class _QuizPageState extends State<QuizPage> {
               ),
               onPressed: () {
                 //The user picked true.
-                checkAnswer(true);
+                checkAnswer(context, true);
               },
             ),
           ),
@@ -121,7 +177,7 @@ class _QuizPageState extends State<QuizPage> {
               onPressed: () {
                 //The user picked false.
 
-                checkAnswer(false);
+                checkAnswer(context, false);
               },
             ),
           ),
